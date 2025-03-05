@@ -13,20 +13,16 @@ def home():
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    news_text = request.json['news_text']
+    news_text = request.form['news_text']
 
-    # Ask ChatGPT if the news is real or fake
-    chatgpt_response = openai.ChatCompletion.create(
+    # Call ChatGPT API for analysis
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a fact-checking AI that determines if news is real or fake."},
-            {"role": "user", "content": f"Can you analyze this news and tell me if it's real or fake? News: '{news_text}'"}
-        ]
+        messages=[{"role": "user", "content": f"Analyze this news and tell me if it's fake or real: {news_text}"}]
     )
 
-    response_text = chatgpt_response["choices"][0]["message"]["content"]
-
-    return jsonify({"chatgpt_response": response_text})
+    result = response["choices"][0]["message"]["content"]
+    return jsonify({"prediction": result})
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
