@@ -1,25 +1,32 @@
-function checkNews() {
-    let newsText = document.getElementById("news_input").value;
-    let responseDiv = document.getElementById("response");
+async function checkNews() {
+    let newsText = document.getElementById("newsInput").value;
+    let resultDiv = document.getElementById("result");
+    let loader = document.getElementById("loader");
 
-    if (newsText.trim() === "") {
-        responseDiv.innerHTML = "<p style='color: red;'>⚠️ Please enter news text.</p>";
+    if (!newsText) {
+        alert("⚠️ Please enter news text!");
         return;
     }
 
-    responseDiv.innerHTML = "<p>⏳ Checking for fake news...</p>";
+    // Show loader while waiting for response
+    loader.style.display = "block";
+    resultDiv.style.display = "none";
 
-    fetch("/predict", {
+    let response = await fetch("https://your-api-url.com/predict", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ news_text: newsText })
-    })
-    .then(response => response.json())
-    .then(data => {
-        responseDiv.innerHTML = `<p>🧠 ChatGPT Response: ${data.chatgpt_response}</p>`;
-    })
-    .catch(error => {
-        responseDiv.innerHTML = "<p style='color: red;'>❌ Error checking news. Try again.</p>";
-        console.error(error);
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `news_text=${encodeURIComponent(newsText)}`
     });
+
+    let data = await response.json();
+    loader.style.display = "none";  // Hide loader
+    resultDiv.style.display = "block";  // Show result
+
+    resultDiv.innerHTML = `
+        <p><strong>🧠 AI Analysis:</strong> ${data.AI_Analysis}</p>
+        <p><strong>🔗 Trusted Sources:</strong></p>
+        <ul>
+            ${data.Trusted_News_Links.map(link => `<li><a href="${link.link}" target="_blank">${link.title}</a></li>`).join('')}
+        </ul>
+    `;
 }
