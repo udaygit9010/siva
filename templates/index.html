@@ -4,16 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fake News Detector</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <div class="container">
         <h1>📰 Fake News Detector</h1>
-        <textarea id="news_input" placeholder="Enter news text here..."></textarea>
+        <input type="text" id="newsInput" placeholder="Enter a news headline..." />
         <button onclick="checkNews()">Check News</button>
-        <div id="response"></div>
+        
+        <div class="loader" id="loader"></div>
+
+        <div id="result"></div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script src="script.js"></script>
+
 </body>
 </html>
+
