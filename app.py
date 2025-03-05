@@ -38,7 +38,7 @@ def search_google_news(query):
 
 @app.route('/')
 def home():
-    return "Fake News Detection API is running!"
+   return render_template("index.html")
 
 @app.route('/predict', methods=['POST'])
 def predict():
