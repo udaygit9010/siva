@@ -12,7 +12,7 @@ async function checkNews() {
     loader.style.display = "block";
     resultDiv.style.display = "none";
 
-    let response = await fetch("https://your-api-url.com/predict", {
+    let response = await fetch("https://news-det.onrender.com/predict", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `news_text=${encodeURIComponent(newsText)}`
