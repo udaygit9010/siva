@@ -1,20 +1,28 @@
 import openai
 import requests
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-CORS(app)
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
-# Set your OpenAI API key
-openai.api_key = "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"
+# Get API keys from environment variables
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+SEARCH_ENGINE_ID = os.getenv("SEARCH_ENGINE_ID")
+
+if not OPENAI_API_KEY or not GOOGLE_API_KEY or not SEARCH_ENGINE_ID:
+    raise ValueError("⚠️ Missing API keys! Set them as environment variables.")
+
+openai.api_key = OPENAI_API_KEY
 
 # Function to search Google News for verification
 def search_google_news(query):
-    GOOGLE_API_KEY = "AIzaSyAkKcye33pAhbFoU_aCZ1gRMEF7ul-kTk8"
-# Replace with your Google API Key
-    SEARCH_ENGINE_ID = "142a8acb8a92a4611"  # Replace with your Custom Search Engine ID
-
     url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={SEARCH_ENGINE_ID}&key={GOOGLE_API_KEY}"
     response = requests.get(url)
     
@@ -45,7 +53,7 @@ def predict():
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": f"Analyze this news and tell me if it's fake or real: {news_text}"}]
         )
-        ai_result = ai_response.get("choices", [{}])[0].get("message", {}).get("content", "Error processing AI response")
+        ai_result = ai_response["choices"][0]["message"]["content"]
     except Exception as e:
         return jsonify({"error": f"AI analysis failed: {str(e)}"}), 500
 
