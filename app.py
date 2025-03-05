@@ -1,29 +1,42 @@
-from flask import Flask, request, render_template, jsonify
 import openai
-import os
+import requests
+from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Set your OpenAI API key (Replace with actual API key)
-openai.api_key = "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"
+openai.api_key = "YOUR_OPENAI_API_KEY"
 
-@app.route('/')
-def home():
-    return render_template("index.html")
+# Function to search Google News for the news headline
+def search_google_news(query):
+    url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx=YOUR_CSE_ID&key=142a8acb8a92a4611"
+    response = requests.get(url)
+    results = response.json()
+    
+    news_links = []
+    if "items" in results:
+        for item in results["items"]:
+            news_links.append({"title": item["title"], "link": item["link"]})
+    
+    return news_links
 
 @app.route('/predict', methods=['POST'])
 def predict():
     news_text = request.form['news_text']
 
-    # Call ChatGPT API for analysis
-    response = openai.ChatCompletion.create(
+    # Step 1: Ask ChatGPT for an analysis
+    ai_response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": f"Analyze this news and tell me if it's fake or real: {news_text}"}]
     )
+    ai_result = ai_response["choices"][0]["message"]["content"]
 
-    result = response["choices"][0]["message"]["content"]
-    return jsonify({"prediction": result})
+    # Step 2: Search Google News for verification
+    news_results = search_google_news(news_text[:50])  # Search using first 50 characters of news text
+
+    return jsonify({
+        "AI_Analysis": ai_result,
+        "Trusted_News_Links": news_results if news_results else "No matching news found"
+    })
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True)
