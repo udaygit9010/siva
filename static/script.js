@@ -12,10 +12,10 @@ function checkNews() {
     resultDiv.style.display = "none";
     resultDiv.innerHTML = "";
 
-    fetch("/predict", {
+    fetch("/analyze", {  // 🔹 Updated endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ news_text: newsText })
+        body: JSON.stringify({ text: newsText }) // 🔹 Ensure key matches Flask API
     })
     .then(response => response.json())
     .then(data => {
@@ -27,9 +27,9 @@ function checkNews() {
             return;
         }
 
-        let analysis = `<p><strong>AI Analysis:</strong> ${data.AI_Analysis}</p>`;
+        let analysis = `<p><strong>AI Analysis:</strong> ${data.analysis}</p>`;
 
-        let newsResults = data.Trusted_News_Links;
+        let newsResults = data.google_results.items;  // 🔹 Updated key to match API response
         if (!newsResults || newsResults.length === 0) {
             resultDiv.innerHTML = `${analysis} <p>No matching news found.</p>`;
             return;
@@ -41,7 +41,6 @@ function checkNews() {
                     <tr>
                         <th>Title</th>
                         <th>Source</th>
-                        <th>Accuracy</th>
                         <th>Link</th>
                     </tr>`;
 
@@ -49,8 +48,7 @@ function checkNews() {
             tableHTML += `
                 <tr>
                     <td>${news.title}</td>
-                    <td>${news.source}</td>
-                    <td>${news.accuracy}</td>
+                    <td>${news.displayLink}</td>
                     <td><a href="${news.link}" target="_blank">Read More</a></td>
                 </tr>`;
         });
