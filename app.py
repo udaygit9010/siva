@@ -71,14 +71,16 @@ def analyze_text():
     # Search Google News for comparison
     google_results = search_google_news(text)
    
+    # ✅ Correct indentation for result dictionary
     result = {
         "analysis": "This news appears to be real." if prediction == 1 else "This news might be fake.",
-        "is_fake": prediction == 0,
-        "confidence": confidence,
+        "is_fake": int(prediction == 0),  # Convert boolean to integer (0 or 1)
+        "confidence": float(confidence),  # Convert NumPy float to Python float
         "google_results": google_results
     }
-   
+
     return jsonify(result)
+
 
 if __name__ == "__main__":
     app.run(debug=True)
