@@ -54,32 +54,37 @@ def search_google_news(query):
 @app.route("/", methods=["GET"])
 def home():
     return render_template("index.html")
-
 @app.route("/analyze", methods=["POST"])
 def analyze_text():
     data = request.get_json()
     text = data.get("text", "")
-   
+
     if not text:
         return jsonify({"error": "No text provided"}), 400
-   
-    # Use SVM model for fake news detection
+
+    # Transform input text
     X_input = vectorizer.transform([text])
+    
+    # Make a prediction
     prediction = model.predict(X_input)[0]
     confidence = np.max(model.predict_proba(X_input))
-   
+    
+    print(f"🔍 Text: {text}")  # Debugging
+    print(f"📊 Prediction: {prediction}")  # Debugging
+    print(f"🎯 Confidence: {confidence}")  # Debugging
+
     # Search Google News for comparison
     google_results = search_google_news(text)
-   
-    # ✅ Correct indentation for result dictionary
+
     result = {
         "analysis": "This news appears to be real." if prediction == 1 else "This news might be fake.",
-        "is_fake": int(prediction == 0),  # Convert boolean to integer (0 or 1)
-        "confidence": float(confidence),  # Convert NumPy float to Python float
+        "is_fake": int(prediction == 0),
+        "confidence": float(confidence),
         "google_results": google_results
     }
 
     return jsonify(result)
+
 
 
 if __name__ == "__main__":
