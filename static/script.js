@@ -12,7 +12,7 @@ function checkNews() {
     resultDiv.style.display = "none";
     resultDiv.innerHTML = "";
 
-    fetch("/analyze", {  // 🔹 Updated endpoint
+    fetch("https://detect-blix.onrender.com//analyze", {  // 🔹 Updated endpoint
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: newsText }) // 🔹 Ensure key matches Flask API
